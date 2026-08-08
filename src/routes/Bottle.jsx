@@ -8,6 +8,8 @@ import { useSession } from '../context/SessionProvider'
 import { supabase } from '../lib/supabaseClient'
 import { getBottle, saveStory, addSnap, addTag, createShareLink, deleteBottle, updateBottle } from '../lib/bottles'
 import { shrink } from '../lib/resize'
+import { copyText } from '../lib/clipboard'
+import { Audio2 } from '../lib/audio'
 
 export default function Bottle() {
   const { id } = useParams()
@@ -19,6 +21,7 @@ export default function Bottle() {
   const [tagOpen, setTagOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [toast, setToast] = useState('')
+  const [justShared, setJustShared] = useState(false)
 
   const load = useCallback(() => {
     getBottle(id).then(setState).catch((e) => setError(e.message))
@@ -50,12 +53,34 @@ export default function Bottle() {
   const isOwner = bottle.owner_id === profile.id
   const storyFor = (p) => stories.find((s) => s.participant_id === p.id)
 
+  const markShared = () => {
+    setJustShared(true)
+    setTimeout(() => setJustShared(false), 2200)
+  }
+
   const share = async () => {
-    const link = await createShareLink(bottle.id, profile.id, true)
+    let link
+    try {
+      link = await createShareLink(bottle.id, profile.id, true)
+    } catch {
+      flash("couldn't create a share link")
+      return
+    }
     const url = `${window.location.origin}/share/${link.token}`
-    if (navigator.share) navigator.share({ title: bottle.label, url }).catch(() => {})
-    else navigator.clipboard?.writeText(url)
-    flash('share link copied')
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: bottle.label, url })
+        markShared()
+        return
+      } catch {
+        // cancelled, or the OS share sheet isn't available — fall through to clipboard
+      }
+    }
+
+    const copied = await copyText(url)
+    flash(copied ? 'share link copied' : url)
+    if (copied) markShared()
   }
 
   const removeBottle = async () => {
@@ -73,7 +98,24 @@ export default function Bottle() {
 
   return (
     <div>
-      <Navbar onBack={() => navigate('/')} />
+      <Navbar
+        onBack={() => navigate('/')}
+        actions={
+          <button
+            className="btn btn-solid"
+            aria-pressed={justShared}
+            onClick={share}
+            onPointerEnter={() => Audio2.hover()}
+            style={
+              justShared
+                ? { background: 'var(--pearl)', color: 'var(--ink)', borderColor: 'var(--ink)' }
+                : undefined
+            }
+          >
+            {justShared ? '✓ shared' : 'share'}
+          </button>
+        }
+      />
       <section id="night-view" className="on" aria-live="polite">
         <div className="stage">
           {bottle.date && (
@@ -219,18 +261,10 @@ export default function Bottle() {
                   <button className="btn" onClick={() => setTagOpen(true)}>
                     + tag someone
                   </button>
-                  <button className="btn" onClick={share}>
-                    share
-                  </button>
                   <button className="btn" onClick={removeBottle} style={{ color: '#B4231C' }}>
                     trash
                   </button>
                 </>
-              )}
-              {!isOwner && (
-                <button className="btn" onClick={share}>
-                  share
-                </button>
               )}
             </div>
           </div>
@@ -403,7 +437,7 @@ function TagModal({ onClose, onSave }) {
   const [tags, setTags] = useState([])
   const [busy, setBusy] = useState(false)
   return (
-    <Modal title="Tag someone" subtitle="From your friends, or just type a name." onClose={onClose}>
+    <Modal title="Tag someone" subtitle="From your glass mates, or just type a name." onClose={onClose}>
       <TagPicker tags={tags} setTags={setTags} />
       <div className="actions">
         <button className="btn" onClick={onClose}>

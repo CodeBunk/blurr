@@ -36,19 +36,19 @@ input,textarea,select{font:inherit;color:inherit}
 #shelfnav{display:none;flex:0 0 auto;order:3;width:100%;justify-content:center}
 #shelfnav.on{display:flex}
 @media(min-width:900px){#shelfnav{order:0;width:auto}}
-.dial{position:relative;width:min(430px,76vw);height:40px;overflow:hidden;cursor:pointer;
-  -webkit-mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);
-  mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
-.dial .arc{position:absolute;left:50%;top:8px;width:496px;height:496px;margin-left:-248px;border-radius:50%;
+.dial{position:relative;width:min(600px,90vw);height:56px;overflow:hidden;cursor:pointer;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);
+  mask:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.dial .arc{position:absolute;left:50%;top:11px;width:694px;height:694px;margin-left:-347px;border-radius:50%;
   border:1px solid var(--line-2);pointer-events:none}
-.dial .tick{position:absolute;left:50%;top:8px;width:1px;height:4px;background:var(--line);
+.dial .tick{position:absolute;left:50%;top:11px;width:1.5px;height:6px;background:var(--line);
   transition:transform .62s var(--spring);pointer-events:none}
-.dial .pin{position:absolute;left:50%;top:2px;transform:translateX(-50%);width:1px;height:7px;background:var(--ink);pointer-events:none;z-index:3}
-.spoke{position:absolute;left:50%;top:15px;white-space:nowrap;font-family:var(--mono);font-size:11px;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
-  display:inline-flex;align-items:baseline;gap:6px;
+.dial .pin{position:absolute;left:50%;top:3px;transform:translateX(-50%);width:1.5px;height:10px;background:var(--ink);pointer-events:none;z-index:3}
+.spoke{position:absolute;left:50%;top:24px;white-space:nowrap;font-family:var(--mono);font-size:10px;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);
+  display:inline-flex;align-items:baseline;gap:5px;
   transition:transform .62s var(--spring),opacity .62s var(--smooth),color .3s var(--smooth)}
-.spoke .n{font-size:8.5px;opacity:.5}
+.spoke .n{font-size:8px;opacity:.5}
 .spoke.cur{color:var(--ink);font-weight:600}
 .spoke.cur .n{opacity:1}
 .dial:hover .spoke:not(.cur){color:var(--ink-2)}

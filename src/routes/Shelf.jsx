@@ -121,15 +121,19 @@ function BottleItem({ bottle, index, allBottles, setBottles, onDrop, onOpen }) {
   const ref = useRef(null)
   const drag = useRef(null)
 
+  // Every bottle is tap-to-open, whether you own it or were just tagged on
+  // it — only actually dragging-to-reorder is restricted to the owner. The
+  // pointer tracker has to start on every bottle regardless, or there's
+  // nothing for onPointerUp to open with on a plain tap.
   const onPointerDown = (e) => {
-    if (!canDrag || e.button) return
+    if (e.button) return
     drag.current = { id: bottle.id, x0: e.clientX, y0: e.clientY, moved: 0 }
     ref.current.setPointerCapture(e.pointerId)
   }
 
   const onPointerMove = (e) => {
     const d = drag.current
-    if (!d) return
+    if (!d || !canDrag) return
     d.moved = Math.hypot(e.clientX - d.x0, e.clientY - d.y0)
     if (d.moved <= 8) return
     if (!ref.current.classList.contains('lifting')) Audio2.pickup()
@@ -153,7 +157,7 @@ function BottleItem({ bottle, index, allBottles, setBottles, onDrop, onOpen }) {
     drag.current = null
     ref.current?.classList.remove('lifting')
     if (!d) return
-    if (d.moved <= 8) {
+    if (!canDrag || d.moved <= 8) {
       onOpen(bottle.id)
     } else {
       Audio2.place()

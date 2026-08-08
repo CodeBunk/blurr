@@ -37,7 +37,7 @@ export default function Onboarding() {
   }
 
   return (
-    <AuthShell title="Set up your profile" subtitle="This is how friends will find and tag you.">
+    <AuthShell title="Set up your profile" subtitle="This is how glass mates will find and tag you.">
       <form onSubmit={submit} className="flex flex-col gap-4">
         <Field label="Display name">
           <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Rahul" />

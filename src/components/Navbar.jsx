@@ -5,7 +5,7 @@ import SoundToggle from './SoundToggle'
 import SettingsDrawer from './SettingsDrawer'
 import { Audio2 } from '../lib/audio'
 
-export default function Navbar({ onBack, count, dial }) {
+export default function Navbar({ onBack, count, dial, actions }) {
   const { profile, signOut } = useSession()
   const { setDrawerOpen } = useChrome()
   const navigate = useNavigate()
@@ -27,6 +27,7 @@ export default function Navbar({ onBack, count, dial }) {
         {dial && <nav className="on" style={{ display: 'flex', flex: '0 0 auto', order: 3, width: '100%', justifyContent: 'center' }}>{dial}</nav>}
 
         <div className="tools">
+          {actions}
           <SoundToggle />
           <button className="iconbtn" aria-label="settings" onClick={() => setDrawerOpen(true)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -40,7 +41,7 @@ export default function Navbar({ onBack, count, dial }) {
             </button>
           ) : (
             <Link to="/friends" className="btn" onPointerEnter={() => Audio2.hover()}>
-              friends
+              glass mates
             </Link>
           )}
           {profile && (

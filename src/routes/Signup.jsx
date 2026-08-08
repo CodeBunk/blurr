@@ -47,7 +47,13 @@ export default function Signup() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { username, display_name: username } },
+      options: {
+        data: { username, display_name: username },
+        // Explicit, so the confirmation link always points at wherever
+        // this build is actually running — not whatever the Supabase
+        // dashboard's Site URL happens to be set to at the time.
+        emailRedirectTo: window.location.origin,
+      },
     })
     setBusy(false)
     if (error) return setError(error.message)

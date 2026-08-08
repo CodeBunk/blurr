@@ -38,7 +38,7 @@ export default function Friends() {
       <Navbar />
       <main className="wrap" style={{ maxWidth: 640, paddingTop: 48, paddingBottom: 80 }}>
         <h2 className="grad" style={{ marginBottom: 22 }}>
-          Friends
+          Glass mates
         </h2>
 
         <div className="field">
@@ -103,7 +103,7 @@ export default function Friends() {
           </Group>
         )}
 
-        <Group title="Your friends">
+        <Group title="Your glass mates">
           {accepted.length ? (
             accepted.map((f) => (
               <Row key={f.id}>
@@ -120,7 +120,7 @@ export default function Friends() {
               </Row>
             ))
           ) : (
-            <p className="none">No friends yet — search above to add some.</p>
+            <p className="none">No glass mates yet — search above to add some.</p>
           )}
         </Group>
       </main>

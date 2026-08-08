@@ -125,7 +125,7 @@ export default function Landing() {
       <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 26px 100px', textAlign: 'center' }}>
         <h2 style={{ fontSize: 26, marginBottom: 12 }}>Tag someone, they get the bottle too</h2>
         <p style={{ color: 'var(--ink-2)', maxWidth: 520, margin: '0 auto' }}>
-          No groups to set up. Tag a friend on a bottle and it shows up on their shelf. Type a name
+          No groups to set up. Tag a glass mate on a bottle and it shows up on their shelf. Type a name
           they haven't joined yet, and it's waiting for them the moment they sign up and confirm it's them.
         </p>
       </section>
