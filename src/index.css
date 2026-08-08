@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* The Blurr design bible — ported verbatim from the original prototype.
+   Tailwind is still used for one-off layout on newer screens (auth forms,
+   friends list) that don't have an equivalent in the original design. */
+@import "./blurr-theme.css";
+
+@theme {
+  --font-sans: "Inter Tight", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--pearl);color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit;text-decoration:none}
+input,textarea,select{font:inherit;color:inherit}
+::selection{background:var(--ink);color:var(--pearl)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
+.grad{background:linear-gradient(175deg,#000 8%,#3E3C39 62%,#7B7873);-webkit-background-clip:text;background-clip:text;color:transparent}
