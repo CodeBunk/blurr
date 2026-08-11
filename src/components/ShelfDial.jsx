@@ -58,8 +58,8 @@ export default function ShelfDial({ value, onChange }) {
     d.moved = Math.max(d.moved, Math.abs(dx))
     if (d.moved <= 6) return
     if (!dragging) setDragging(true)
-    // dragging right brings earlier options in, like turning a real bezel
-    const next = Math.max(0, Math.min(N - 1, d.startPos - dx / PX_PER_STEP))
+    // dragging right brings later options in
+    const next = Math.max(0, Math.min(N - 1, d.startPos + dx / PX_PER_STEP))
     setPos(next)
     commit(Math.round(next))
   }

@@ -5,5 +5,20 @@ import { artFor } from '../lib/presets'
 // the original app's behaviour.
 export default function BottleGlyph({ skin, photoUrl, size = 120 }) {
   const src = photoUrl || artFor(skin)
-  return <img src={src} alt="" style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }} />
+  return (
+    <img
+      src={src}
+      alt=""
+      draggable={false}
+      style={{
+        height: size,
+        width: 'auto',
+        display: 'block',
+        objectFit: 'contain',
+        WebkitUserDrag: 'none',
+        userSelect: 'none',
+        pointerEvents: 'none',
+      }}
+    />
+  )
 }

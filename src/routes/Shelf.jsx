@@ -64,6 +64,8 @@ export default function Shelf() {
                 + add the first bottle
               </button>
             </div>
+          ) : bottles.length === 1 ? (
+            <FeaturedBottle bottle={bottles[0]} onOpen={() => navigate(`/b/${bottles[0].id}`)} />
           ) : (
             racks.map((row, ri) => (
               <Rack
@@ -95,6 +97,39 @@ export default function Shelf() {
           }}
         />
       )}
+    </div>
+  )
+}
+
+// With only one bottle on the shelf, a whole rack row of empty space looks
+// broken — show it big and centered instead, like a single record on
+// display rather than a grid tile.
+function FeaturedBottle({ bottle, onOpen }) {
+  return (
+    <div
+      className="bottle"
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onPointerEnter={() => Audio2.hover()}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onOpen()}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 14,
+        padding: '48px 24px',
+        cursor: 'pointer',
+        maxWidth: 360,
+        margin: '0 auto',
+      }}
+    >
+      <div className="vis">
+        <BottleGlyph skin={bottle.skin} photoUrl={bottle.photo_url} size={220} />
+      </div>
+      <div className="nm" style={{ fontSize: 20 }}>
+        {bottle.label}
+      </div>
     </div>
   )
 }
@@ -134,13 +169,48 @@ function BottleItem({ bottle, index, allBottles, setBottles, onDrop, onOpen }) {
   const onPointerMove = (e) => {
     const d = drag.current
     if (!d || !canDrag) return
+    // If the button/touch was released without us ever getting a
+    // pointerup (lost focus, released outside the window, browser
+    // cancelled the gesture, etc.), the drag never officially ended —
+    // and every later mouse movement, even plain hovering, would keep
+    // reordering things as if still dragging. Bail out the moment we
+    // notice nothing is actually being held down anymore.
+    if (e.buttons === 0) {
+      drag.current = null
+      ref.current?.classList.remove('lifting')
+      return
+    }
     d.moved = Math.hypot(e.clientX - d.x0, e.clientY - d.y0)
     if (d.moved <= 8) return
     if (!ref.current.classList.contains('lifting')) Audio2.pickup()
     ref.current.classList.add('lifting')
-    const under = document.elementFromPoint(e.clientX, e.clientY)?.closest('.bottle')
-    if (!under || under === ref.current) return
-    const overId = under.dataset.id
+
+    // Find whichever bottle in this row sits closest to the pointer, by
+    // actual position rather than document.elementFromPoint — that fails
+    // whenever the pointer is over a gap, or past the last item in the
+    // row (nothing to hit-test there), which is exactly why the rightmost
+    // slot could never be reordered before.
+    const row = ref.current.closest('.shelfline')
+    if (!row) return
+    let closest = null
+    let closestDist = Infinity
+    for (const el of row.querySelectorAll('.bottle')) {
+      if (el === ref.current) continue
+      const r = el.getBoundingClientRect()
+      const dist = Math.abs(e.clientX - (r.left + r.width / 2))
+      if (dist < closestDist) {
+        closestDist = dist
+        closest = el
+      }
+    }
+    if (!closest) return
+    const overId = closest.dataset.id
+    if (overId === d.lastOverId) return
+    const fromIdx = allBottles.findIndex((x) => x.id === d.id)
+    const toIdx = allBottles.findIndex((x) => x.id === overId)
+    if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return
+    d.lastOverId = overId
+    Audio2.shift(Math.abs(toIdx - fromIdx))
     setBottles((cur) => {
       const from = cur.findIndex((x) => x.id === d.id)
       const to = cur.findIndex((x) => x.id === overId)
@@ -152,10 +222,20 @@ function BottleItem({ bottle, index, allBottles, setBottles, onDrop, onOpen }) {
     })
   }
 
-  const onPointerUp = () => {
+  const endDrag = (e) => {
+    try {
+      ref.current?.releasePointerCapture(e.pointerId)
+    } catch {
+      /* already released */
+    }
     const d = drag.current
     drag.current = null
     ref.current?.classList.remove('lifting')
+    return d
+  }
+
+  const onPointerUp = (e) => {
+    const d = endDrag(e)
     if (!d) return
     if (!canDrag || d.moved <= 8) {
       onOpen(bottle.id)
@@ -163,6 +243,10 @@ function BottleItem({ bottle, index, allBottles, setBottles, onDrop, onOpen }) {
       Audio2.place()
       onDrop(allBottles)
     }
+  }
+
+  const onPointerCancel = (e) => {
+    endDrag(e)
   }
 
   return (
@@ -176,6 +260,7 @@ function BottleItem({ bottle, index, allBottles, setBottles, onDrop, onOpen }) {
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
       onPointerEnter={() => Audio2.hover()}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onOpen(bottle.id)}
     >

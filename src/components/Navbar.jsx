@@ -1,14 +1,12 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useSession } from '../context/SessionProvider'
+import { Link } from 'react-router-dom'
 import { useChrome } from '../context/ChromeProvider'
 import SoundToggle from './SoundToggle'
 import SettingsDrawer from './SettingsDrawer'
+import GlassMatesDrawer from './GlassMatesDrawer'
 import { Audio2 } from '../lib/audio'
 
-export default function Navbar({ onBack, count, dial, actions }) {
-  const { profile, signOut } = useSession()
-  const { setDrawerOpen } = useChrome()
-  const navigate = useNavigate()
+export default function Navbar({ count, dial, actions }) {
+  const { setDrawerOpen, setMateDrawerOpen } = useChrome()
 
   return (
     <>
@@ -35,26 +33,20 @@ export default function Navbar({ onBack, count, dial, actions }) {
               <path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1A1.6 1.6 0 006 19.4l-.1.1a2 2 0 11-2.8-2.8l.1-.1A1.6 1.6 0 002.5 14H2a2 2 0 110-4h.1A1.6 1.6 0 004.6 6l-.1-.1a2 2 0 112.8-2.8l.1.1A1.6 1.6 0 0010 4.5V4a2 2 0 114 0v.1A1.6 1.6 0 0018 4.6l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 001.1 2.7H22a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z" />
             </svg>
           </button>
-          {onBack ? (
-            <button className="btn" onClick={onBack} onPointerEnter={() => Audio2.hover()}>
-              ← the shelf
-            </button>
-          ) : (
-            <Link to="/friends" className="btn" onPointerEnter={() => Audio2.hover()}>
-              glass mates
-            </Link>
-          )}
-          {profile && (
-            <span style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
-              {profile.display_name}
-            </span>
-          )}
-          <button className="btn" onClick={() => signOut().then(() => navigate('/'))}>
-            sign out
+          <button
+            className="btn"
+            onClick={() => {
+              Audio2.click()
+              setMateDrawerOpen(true)
+            }}
+            onPointerEnter={() => Audio2.hover()}
+          >
+            glass mates
           </button>
         </div>
       </header>
       <SettingsDrawer />
+      <GlassMatesDrawer />
     </>
   )
 }

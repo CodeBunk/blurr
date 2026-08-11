@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabaseClient'
 import { getBottle, saveStory, addSnap, addTag, createShareLink, deleteBottle, updateBottle } from '../lib/bottles'
 import { shrink } from '../lib/resize'
 import { copyText } from '../lib/clipboard'
+import ShareButton from '../components/ShareButton'
 import { Audio2 } from '../lib/audio'
 
 export default function Bottle() {
@@ -98,30 +99,30 @@ export default function Bottle() {
 
   return (
     <div>
-      <Navbar
-        onBack={() => navigate('/')}
-        actions={
-          <button
-            className="btn btn-solid"
-            aria-pressed={justShared}
-            onClick={share}
-            onPointerEnter={() => Audio2.hover()}
-            style={
-              justShared
-                ? { background: 'var(--pearl)', color: 'var(--ink)', borderColor: 'var(--ink)' }
-                : undefined
-            }
-          >
-            {justShared ? '✓ shared' : 'share'}
-          </button>
-        }
-      />
+      <Navbar />
       <section id="night-view" className="on" aria-live="polite">
+        <div className="fixed top-20 left-6 z-50" style={{ padding: '0 10px' }}>
+          <button
+            className="back-link"
+            onClick={() => {
+              Audio2.click()
+              navigate('/')
+            }}
+            onPointerEnter={() => Audio2.hover()}
+          >
+            ← the shelf
+          </button>
+        </div>
         <div className="stage">
           {bottle.date && (
             <div className="date">{new Date(bottle.date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
           )}
-          <h2 className="grad">{bottle.label}</h2>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 28, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <h2 className="grad" style={{ margin: 0 }}>
+              {bottle.label}
+            </h2>
+            <ShareButton onShare={share} shared={justShared} />
+          </div>
           <div className="kind">
             {bottle.ml ? `${bottle.ml} ml` : ''}
             {bottle.ml && participants.length ? ' · ' : ''}
@@ -157,11 +158,14 @@ export default function Bottle() {
                 ))}
                 <div className="rule" />
                 <div className="total">
-                  <span>TOTAL</span>
+                  <span>ESTIMATED TOTAL</span>
                   <span>
                     {bottle.currency}
                     {(Number(bottle.cost) + (bottle.extras || []).reduce((s, x) => s + (Number(x.amt) || 0), 0)).toLocaleString('en-IN')}
                   </span>
+                </div>
+                <div className="r-foot" style={{ margin: '-6px 0 4px', textAlign: 'left' }}>
+                  bottle price + extras, as entered — not a synced real receipt
                 </div>
                 {participants.length > 0 && (
                   <>
@@ -170,7 +174,7 @@ export default function Bottle() {
                       <span className="q">{participants.length}</span>
                     </div>
                     <div className="split">
-                      <span>EACH</span>
+                      <span>EACH, ESTIMATED</span>
                       <span>
                         {bottle.currency}
                         {(

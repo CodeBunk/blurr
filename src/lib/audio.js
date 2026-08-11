@@ -202,4 +202,18 @@ export const Audio2 = {
     beepAt(t + 0.02, 780, 0.07, 'triangle', 0.045)
     beepAt(t + 0.05, 1300, 0.05, 'sine', 0.03)
   },
+  // A clink each time a dragged bottle bumps another one out of the way —
+  // pitch drops and volume rises with how many slots it jumped, so nudging
+  // one neighbour over sounds like a small tick and shoving it across the
+  // whole row sounds like a bigger, lower clunk.
+  shift(distance) {
+    ensure()
+    if (!sfxOn) return
+    const t = ctx.currentTime
+    const d = Math.max(1, Math.min(distance, 8))
+    const base = 980 - d * 75
+    const gain = Math.min(0.04 + d * 0.011, 0.1)
+    beepAt(t, base, 0.045, 'sine', gain)
+    beepAt(t + 0.022, base * 1.28, 0.04, 'triangle', gain * 0.65)
+  },
 }

@@ -9,7 +9,8 @@ const ChromeContext = createContext(null)
 export function ChromeProvider({ children }) {
   const [musicOn, setMusicOn] = useState(false)
   const [sfxOn, setSfxOn] = useState(true)
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen_] = useState(false)
+  const [mateDrawerOpen, setMateDrawerOpen_] = useState(false)
 
   const toggleMusic = () => setMusicOn(Audio2.toggleMusic())
   const toggleSfx = () => {
@@ -18,8 +19,20 @@ export function ChromeProvider({ children }) {
     setSfxOn(next)
   }
 
+  // Only one side drawer open at a time — opening one closes the other.
+  const setDrawerOpen = (v) => {
+    setDrawerOpen_(v)
+    if (v) setMateDrawerOpen_(false)
+  }
+  const setMateDrawerOpen = (v) => {
+    setMateDrawerOpen_(v)
+    if (v) setDrawerOpen_(false)
+  }
+
   return (
-    <ChromeContext.Provider value={{ musicOn, toggleMusic, sfxOn, toggleSfx, drawerOpen, setDrawerOpen }}>
+    <ChromeContext.Provider
+      value={{ musicOn, toggleMusic, sfxOn, toggleSfx, drawerOpen, setDrawerOpen, mateDrawerOpen, setMateDrawerOpen }}
+    >
       {children}
     </ChromeContext.Provider>
   )
